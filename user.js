@@ -40,35 +40,29 @@ function jumpToError() {
   }
 }
 
-function cloneButton(div, id, text, callback, description) {
+function cloneButton(div, id, text, callback) {
   if (document.getElementById(id) != null) {
     return;
   }
 
-  var clone = div.cloneNode(true);
-  clone.id = id;
-  clone.querySelector("span").innerText = text;
-  var innerDiv = clone.querySelector("div");
-  innerDiv.setAttribute("title", description);
-  innerDiv.querySelector("div").remove();
-  clone.removeAttribute("href");
-  clone.addEventListener("click", callback);
+  var button = document.createElement("button");
+  button.appendChild(document.createTextNode(text));
+  button.id = id;
+  button.addEventListener("click", callback);
 
-  div.insertAdjacentElement("beforebegin", clone);
+  div.insertAdjacentElement("beforebegin", button);
 }
 
 async function main() {
   while (true) {
     await sleep(1000);
-    var insightsButton = document.querySelector(
-      '[title="Insights data for this workflow"]',
-    );
-    if (insightsButton == null) {
+    var notifications = document.querySelector('[aria-label="Notifications"]');
+    if (notifications == null) {
       continue;
     }
 
     cloneButton(
-      insightsButton,
+      notifications.parentElement.parentElement.parentElement.parentElement,
       "jump-to-error",
       "Jump To Error",
       jumpToError,
