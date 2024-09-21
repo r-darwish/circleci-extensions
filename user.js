@@ -12,13 +12,15 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function jumpToError() {
-  if (window.curindex === undefined) {
-    window.curindex = 0;
+function jumpToStatus(status) {
+  if (window[status] === undefined) {
+    window[status] = 0;
   }
 
   if (typeof x === "undefined" || x === null) {
-    var x = document.querySelectorAll('a:has(svg[aria-label="Status Failed"])');
+    var x = document.querySelectorAll(
+      `a:has(svg[aria-label="Status ${status}"])`,
+    );
   }
 
   if (x.length == 0) {
@@ -26,18 +28,21 @@ function jumpToError() {
     return;
   }
 
-  for (i = window.curindex; i < x.length; i++) {
-    console.log("current", x[i].innerText, i);
-    window.curindex = i;
-    x[i]
-      .querySelector('svg[aria-label="Status Failed"]')
-      .scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
-    window.curindex++;
-    if (window.curindex == x.length) {
-      window.curindex = 0;
-    }
-    break;
+  if (window[status] >= x.length) {
+    window[status] = 0;
   }
+  x[window[status]]
+    .querySelector(`svg[aria-label="Status ${status}"]`)
+    .scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
+  window[status]++;
+}
+
+function jumpToError() {
+  return jumpToStatus("Failed");
+}
+
+function jumpToRunning() {
+  return jumpToStatus("Running");
 }
 
 function cloneButton(div, id, text, callback) {
@@ -61,13 +66,11 @@ async function main() {
       continue;
     }
 
-    cloneButton(
-      notifications.parentElement.parentElement.parentElement.parentElement,
-      "jump-to-error",
-      "Jump To Error",
-      jumpToError,
-      "Jump to the next failed job",
-    );
+    var buttonDiv =
+      notifications.parentElement.parentElement.parentElement.parentElement;
+
+    cloneButton(buttonDiv, "jump-to-error", "Next Error", jumpToError);
+    cloneButton(buttonDiv, "jump-to-running", "Next Running", jumpToRunning);
   }
 }
 
