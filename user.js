@@ -58,19 +58,18 @@ function cloneButton(div, id, text, callback) {
 }
 
 async function main() {
-  while (true) {
-    await sleep(1000);
-    var notifications = document.querySelector('[aria-label="Notifications"]');
-    if (notifications == null) {
-      continue;
-    }
-
-    var buttonDiv =
-      notifications.parentElement.parentElement.parentElement.parentElement;
-
-    cloneButton(buttonDiv, "jump-to-error", "Next Error", jumpToError);
-    cloneButton(buttonDiv, "jump-to-running", "Next Running", jumpToRunning);
+  await sleep(1000);
+  var notifications = document.querySelector('[aria-label="Notifications"]');
+  if (notifications == null) {
+    console.log("Cannot find the notifications button");
+    return;
   }
+
+  var buttonDiv =
+    notifications.parentElement.parentElement.parentElement.parentElement;
+
+  cloneButton(buttonDiv, "jump-to-error", "Next Error", jumpToError);
+  cloneButton(buttonDiv, "jump-to-running", "Next Running", jumpToRunning);
 }
 
 main();
