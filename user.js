@@ -24,7 +24,6 @@ function jumpToStatus(status) {
   }
 
   if (x.length == 0) {
-    console.log("No failed jobs found");
     return;
   }
 
