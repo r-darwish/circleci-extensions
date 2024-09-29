@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://app.circleci.com/*
 // @grant       none
-// @version     1.0
+// @version     2.0
 // @author      -
 // @description 20/09/2024, 15:19:45
 // ==/UserScript==
