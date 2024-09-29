@@ -9,8 +9,9 @@
 // ==/UserScript==
 
 const colors = {
-  Passed: "#94E5AB",
+  Passed: "#68a078",
   Failed: "#CC4242",
+  Running: "#1A66F7",
 };
 
 function sleep(ms) {
@@ -56,6 +57,7 @@ function counterElement(buttonDiv, status) {
 
   var a = document.createElement("a");
   a.style.backgroundColor = colors[status];
+  a.style.color = "#ffffff";
   a.style.padding = "10px";
   a.style.borderRadius = "20px";
   a.style.cursor = "pointer";
@@ -81,6 +83,7 @@ async function updateCounter(buttonDiv, status) {
 async function updateCounters(buttonDiv) {
   updateCounter(buttonDiv, "Passed");
   updateCounter(buttonDiv, "Failed");
+  updateCounter(buttonDiv, "Running");
 }
 
 async function tick() {
