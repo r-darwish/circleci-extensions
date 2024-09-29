@@ -10,6 +10,7 @@
 
 const colors = {
   Passed: "#94E5AB",
+  Failed: "#CC4242",
 };
 
 function sleep(ms) {
@@ -42,7 +43,7 @@ function jumpToStatus(status) {
   window[status]++;
 }
 
-async function counterElement(buttonDiv, status) {
+function counterElement(buttonDiv, status) {
   let id = `counter-${status}`;
   let element = document.getElementById(id);
   if (element != null) {
@@ -53,23 +54,35 @@ async function counterElement(buttonDiv, status) {
     jumpToStatus(status);
   };
 
-  var div = document.createElement("a");
-  div.style.backgroundColor = colors[status];
-  div.style.padding = "5px";
-  div.style.borderRadius = "5px";
-  div.appendChild(document.createTextNode("0"));
-  div.id = id;
-  div.addEventListener("click", callback);
+  var a = document.createElement("a");
+  a.style.backgroundColor = colors[status];
+  a.style.padding = "10px";
+  a.style.borderRadius = "20px";
+  a.style.cursor = "pointer";
+  a.appendChild(document.createTextNode("0"));
+  a.visibility = "hidden";
+  a.id = id;
+  a.addEventListener("click", callback);
 
-  buttonDiv.insertAdjacentElement("beforebegin", div);
+  buttonDiv.insertAdjacentElement("beforebegin", a);
+  return a;
 }
 
 async function updateCounter(buttonDiv, status) {
   var element = counterElement(buttonDiv, status);
+  let result = getStatus(status);
+  console.log(`result: ${result.length}, e: ${element}`);
+  if (result.length == 0) {
+    element.visibility = "hidden";
+  } else {
+    element.textContent = `${status}: ${result.length}`;
+    element.visibility = "visible";
+  }
 }
 
 async function updateCounters(buttonDiv) {
   updateCounter(buttonDiv, "Passed");
+  updateCounter(buttonDiv, "Failed");
 }
 
 async function tick() {
