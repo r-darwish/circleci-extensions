@@ -57,11 +57,9 @@ function cloneButton(div, id, text, callback) {
   div.insertAdjacentElement("beforebegin", button);
 }
 
-async function main() {
-  await sleep(1000);
+async function tick() {
   var notifications = document.querySelector('[aria-label="Notifications"]');
   if (notifications == null) {
-    console.log("Cannot find the notifications button");
     return;
   }
 
@@ -70,6 +68,13 @@ async function main() {
 
   cloneButton(buttonDiv, "jump-to-error", "Next Error", jumpToError);
   cloneButton(buttonDiv, "jump-to-running", "Next Running", jumpToRunning);
+}
+
+async function main() {
+  while (true) {
+    await tick();
+    await sleep(1000);
+  }
 }
 
 main();
