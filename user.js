@@ -59,8 +59,7 @@ function counterElement(buttonDiv, status) {
   a.style.padding = "10px";
   a.style.borderRadius = "20px";
   a.style.cursor = "pointer";
-  a.appendChild(document.createTextNode("0"));
-  a.visibility = "hidden";
+  a.style.display = "none";
   a.id = id;
   a.addEventListener("click", callback);
 
@@ -71,12 +70,11 @@ function counterElement(buttonDiv, status) {
 async function updateCounter(buttonDiv, status) {
   var element = counterElement(buttonDiv, status);
   let result = getStatus(status);
-  console.log(`result: ${result.length}, e: ${element}`);
   if (result.length == 0) {
-    element.visibility = "hidden";
+    element.style.display = "none";
   } else {
     element.textContent = `${status}: ${result.length}`;
-    element.visibility = "visible";
+    element.style.display = "block";
   }
 }
 
