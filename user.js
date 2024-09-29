@@ -8,8 +8,16 @@
 // @description 20/09/2024, 15:19:45
 // ==/UserScript==
 
+const colors = {
+  Passed: "#94E5AB",
+};
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getStatus(status) {
+  return document.querySelectorAll(`a:has(svg[aria-label="Status ${status}"])`);
 }
 
 function jumpToStatus(status) {
@@ -18,9 +26,7 @@ function jumpToStatus(status) {
   }
 
   if (typeof x === "undefined" || x === null) {
-    var x = document.querySelectorAll(
-      `a:has(svg[aria-label="Status ${status}"])`,
-    );
+    var x = getStatus(status);
   }
 
   if (x.length == 0) {
@@ -36,25 +42,34 @@ function jumpToStatus(status) {
   window[status]++;
 }
 
-function jumpToError() {
-  return jumpToStatus("Failed");
-}
-
-function jumpToRunning() {
-  return jumpToStatus("Running");
-}
-
-function cloneButton(div, id, text, callback) {
-  if (document.getElementById(id) != null) {
-    return;
+async function counterElement(buttonDiv, status) {
+  let id = `counter-${status}`;
+  let element = document.getElementById(id);
+  if (element != null) {
+    return element;
   }
 
-  var button = document.createElement("button");
-  button.appendChild(document.createTextNode(text));
-  button.id = id;
-  button.addEventListener("click", callback);
+  var callback = function () {
+    jumpToStatus(status);
+  };
 
-  div.insertAdjacentElement("beforebegin", button);
+  var div = document.createElement("a");
+  div.style.backgroundColor = colors[status];
+  div.style.padding = "5px";
+  div.style.borderRadius = "5px";
+  div.appendChild(document.createTextNode("0"));
+  div.id = id;
+  div.addEventListener("click", callback);
+
+  buttonDiv.insertAdjacentElement("beforebegin", div);
+}
+
+async function updateCounter(buttonDiv, status) {
+  var element = counterElement(buttonDiv, status);
+}
+
+async function updateCounters(buttonDiv) {
+  updateCounter(buttonDiv, "Passed");
 }
 
 async function tick() {
@@ -66,8 +81,7 @@ async function tick() {
   var buttonDiv =
     notifications.parentElement.parentElement.parentElement.parentElement;
 
-  cloneButton(buttonDiv, "jump-to-error", "Next Error", jumpToError);
-  cloneButton(buttonDiv, "jump-to-running", "Next Running", jumpToRunning);
+  updateCounters(buttonDiv);
 }
 
 async function main() {
