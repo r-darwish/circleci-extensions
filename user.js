@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://app.circleci.com/*
 // @grant       none
-// @version     2.0
+// @version     2.1
 // @author      -
 // @description 20/09/2024, 15:19:45
 // ==/UserScript==
@@ -12,6 +12,7 @@ const colors = {
   Passed: "#68a078",
   Failed: "#CC4242",
   Running: "#1A66F7",
+  "On Hold": "#BC86D2",
 };
 
 function sleep(ms) {
@@ -84,6 +85,7 @@ async function updateCounters(buttonDiv) {
   updateCounter(buttonDiv, "Passed");
   updateCounter(buttonDiv, "Failed");
   updateCounter(buttonDiv, "Running");
+  updateCounter(buttonDiv, "On Hold");
 }
 
 async function tick() {
