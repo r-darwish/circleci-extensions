@@ -140,6 +140,7 @@ function getWorkflowStatus() {
   }
 
   const mainTag = document.querySelector("main");
+  const branch = mainTag.querySelector("a[href*='branch']")?.textContent;
   const firstHeader = mainTag.querySelector("header");
   const workflowTitle = firstHeader?.querySelector("h1");
   const firstSpan = firstHeader?.querySelector("span");
@@ -148,7 +149,7 @@ function getWorkflowStatus() {
     return null;
   }
 
-  return { status: spanText, name: workflowTitle.textContent };
+  return { status: spanText, name: workflowTitle.textContent, branch: branch };
 }
 
 async function tick() {
@@ -168,7 +169,7 @@ async function tick() {
     currentWorkflowStatus != "Running"
   ) {
     new Notification(currentWorkflowStatus, {
-      body: currentWorkflow?.name,
+      body: currentWorkflow?.name + "\n" + currentWorkflow?.branch,
       icon: "https://d2qm0z2kzhiwa.cloudfront.net/assets/android-chrome-512x512-b0a3962c7ec90ae60cb31f99a3fc37b5.png",
     });
   }
