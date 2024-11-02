@@ -44,7 +44,7 @@ function askNotificationPermission(buttonDiv) {
   a.style.padding = "10px";
   a.style.borderRadius = "20px";
   a.style.cursor = "pointer";
-  a.text = "Enable notifications";
+  a.text = "🔔 Enable Notifications";
   a.id = "enable-notifications";
   a.addEventListener("click", callback);
 
@@ -140,8 +140,8 @@ function getWorkflowStatus() {
   }
 
   const mainTag = document.querySelector("main");
-  const branch = mainTag.querySelector("a[href*='branch']")?.textContent;
-  const firstHeader = mainTag.querySelector("header");
+  const branch = mainTag?.querySelector("a[href*='branch']")?.textContent;
+  const firstHeader = mainTag?.querySelector("header");
   const workflowTitle = firstHeader?.querySelector("h1");
   const firstSpan = firstHeader?.querySelector("span");
   const spanText = firstSpan?.textContent;
@@ -176,6 +176,7 @@ async function tick() {
   savedWorkflowStatus = currentWorkflowStatus;
 
   updateCounters(buttonDiv);
+  askNotificationPermission(buttonDiv);
 }
 
 async function main() {
