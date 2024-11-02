@@ -139,11 +139,16 @@ function getWorkflowStatus() {
     return null;
   }
 
-  var mainTag = document.querySelector("main");
-  var firstHeader = mainTag.querySelector("header");
-  var firstSpan = firstHeader.querySelector("span");
-  var spanText = firstSpan.textContent;
-  return spanText;
+  const mainTag = document.querySelector("main");
+  const firstHeader = mainTag.querySelector("header");
+  const workflowTitle = firstHeader?.querySelector("h1");
+  const firstSpan = firstHeader?.querySelector("span");
+  const spanText = firstSpan?.textContent;
+  if (workflowTitle == null || spanText == null) {
+    return null;
+  }
+
+  return { status: spanText, name: workflowTitle.textContent };
 }
 
 async function tick() {
@@ -155,14 +160,16 @@ async function tick() {
   var buttonDiv =
     notifications.parentElement.parentElement.parentElement.parentElement;
 
-  var currentWorkflowStatus = getWorkflowStatus();
+  var currentWorkflow = getWorkflowStatus();
+  var currentWorkflowStatus = currentWorkflow?.status;
   if (
     savedWorkflowStatus === "Running" &&
     currentWorkflowStatus != null &&
     currentWorkflowStatus != "Running"
   ) {
-    new Notification(`Job is is in status ${currentWorkflowStatus}`, {
-      body: "",
+    new Notification(currentWorkflowStatus, {
+      body: currentWorkflow?.name,
+      icon: "https://d2qm0z2kzhiwa.cloudfront.net/assets/android-chrome-512x512-b0a3962c7ec90ae60cb31f99a3fc37b5.png",
     });
   }
   savedWorkflowStatus = currentWorkflowStatus;
@@ -171,9 +178,14 @@ async function tick() {
 }
 
 async function main() {
-  while (true) {
-    await tick();
-    await sleep(1000);
+  try {
+    while (true) {
+      await tick();
+      await sleep(1000);
+    }
+  } catch (e) {
+    alert("CircieCI extension error");
+    console.error(e);
   }
 }
 
