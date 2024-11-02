@@ -15,6 +15,42 @@ const colors = {
   "On Hold": "#BC86D2",
 };
 
+var savedWorkflowStatus = null;
+
+function askNotificationPermission(buttonDiv) {
+  if (!("Notification" in window)) {
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    return;
+  }
+
+  if (document.getElementById("enable-notifications")) {
+    return;
+  }
+
+  var a = document.createElement("a");
+
+  var callback = function () {
+    Notification.requestPermission().then((permission) => {
+      console.log("Notification permission:", permission);
+      a.style.display = "none";
+    });
+  };
+
+  a.style.backgroundColor = "#1A66F7";
+  a.style.color = "#ffffff";
+  a.style.padding = "10px";
+  a.style.borderRadius = "20px";
+  a.style.cursor = "pointer";
+  a.text = "Enable notifications";
+  a.id = "enable-notifications";
+  a.addEventListener("click", callback);
+
+  buttonDiv.insertAdjacentElement("beforebegin", a);
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -88,6 +124,28 @@ async function updateCounters(buttonDiv) {
   updateCounter(buttonDiv, "On Hold");
 }
 
+function setWorkflowStatus(workflow) {
+  if (currentWorkflow == workflow) {
+    return;
+  }
+
+  currentWorkflow = workflow;
+}
+
+function getWorkflowStatus() {
+  var currentUrl = window.location.href;
+  var parts = currentUrl.split("/");
+  if (parts[8] != "workflows") {
+    return null;
+  }
+
+  var mainTag = document.querySelector("main");
+  var firstHeader = mainTag.querySelector("header");
+  var firstSpan = firstHeader.querySelector("span");
+  var spanText = firstSpan.textContent;
+  return spanText;
+}
+
 async function tick() {
   var notifications = document.querySelector('[aria-label="Notifications"]');
   if (notifications == null) {
@@ -96,6 +154,18 @@ async function tick() {
 
   var buttonDiv =
     notifications.parentElement.parentElement.parentElement.parentElement;
+
+  var currentWorkflowStatus = getWorkflowStatus();
+  if (
+    savedWorkflowStatus === "Running" &&
+    currentWorkflowStatus != null &&
+    currentWorkflowStatus != "Running"
+  ) {
+    new Notification(`Job is is in status ${currentWorkflowStatus}`, {
+      body: "",
+    });
+  }
+  savedWorkflowStatus = currentWorkflowStatus;
 
   updateCounters(buttonDiv);
 }
