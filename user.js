@@ -15,6 +15,42 @@ const colors = {
   "On Hold": "#BC86D2",
 };
 
+var savedWorkflowStatus = null;
+
+function askNotificationPermission(buttonDiv) {
+  if (!("Notification" in window)) {
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    return;
+  }
+
+  if (document.getElementById("enable-notifications")) {
+    return;
+  }
+
+  var a = document.createElement("a");
+
+  var callback = function () {
+    Notification.requestPermission().then((permission) => {
+      console.log("Notification permission:", permission);
+      a.style.display = "none";
+    });
+  };
+
+  a.style.backgroundColor = "#1A66F7";
+  a.style.color = "#ffffff";
+  a.style.padding = "10px";
+  a.style.borderRadius = "20px";
+  a.style.cursor = "pointer";
+  a.text = "🔔 Enable Notifications";
+  a.id = "enable-notifications";
+  a.addEventListener("click", callback);
+
+  buttonDiv.insertAdjacentElement("beforebegin", a);
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -88,6 +124,34 @@ async function updateCounters(buttonDiv) {
   updateCounter(buttonDiv, "On Hold");
 }
 
+function setWorkflowStatus(workflow) {
+  if (currentWorkflow == workflow) {
+    return;
+  }
+
+  currentWorkflow = workflow;
+}
+
+function getWorkflowStatus() {
+  var currentUrl = window.location.href;
+  var parts = currentUrl.split("/");
+  if (parts[8] != "workflows") {
+    return null;
+  }
+
+  const mainTag = document.querySelector("main");
+  const branch = mainTag?.querySelector("a[href*='branch']")?.textContent;
+  const firstHeader = mainTag?.querySelector("header");
+  const workflowTitle = firstHeader?.querySelector("h1");
+  const firstSpan = firstHeader?.querySelector("span");
+  const spanText = firstSpan?.textContent;
+  if (workflowTitle == null || spanText == null) {
+    return null;
+  }
+
+  return { status: spanText, name: workflowTitle.textContent, branch: branch };
+}
+
 async function tick() {
   var notifications = document.querySelector('[aria-label="Notifications"]');
   if (notifications == null) {
@@ -97,13 +161,33 @@ async function tick() {
   var buttonDiv =
     notifications.parentElement.parentElement.parentElement.parentElement;
 
+  var currentWorkflow = getWorkflowStatus();
+  var currentWorkflowStatus = currentWorkflow?.status;
+  if (
+    savedWorkflowStatus === "Running" &&
+    currentWorkflowStatus != null &&
+    currentWorkflowStatus != "Running"
+  ) {
+    new Notification(currentWorkflowStatus, {
+      body: currentWorkflow?.name + "\n" + currentWorkflow?.branch,
+      icon: "https://d2qm0z2kzhiwa.cloudfront.net/assets/android-chrome-512x512-b0a3962c7ec90ae60cb31f99a3fc37b5.png",
+    });
+  }
+  savedWorkflowStatus = currentWorkflowStatus;
+
   updateCounters(buttonDiv);
+  askNotificationPermission(buttonDiv);
 }
 
 async function main() {
-  while (true) {
-    await tick();
-    await sleep(1000);
+  try {
+    while (true) {
+      await tick();
+      await sleep(1000);
+    }
+  } catch (e) {
+    alert("CircieCI extension error");
+    console.error(e);
   }
 }
 
