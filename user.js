@@ -56,7 +56,7 @@ function sleep(ms) {
 }
 
 function getStatus(status) {
-  return document.querySelectorAll(`a:has(svg[aria-label="Status ${status}"])`);
+  return document.querySelectorAll(`svg[aria-label="Status ${status}"]`);
 }
 
 function jumpToStatus(status) {
