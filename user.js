@@ -76,7 +76,6 @@ function jumpToStatus(status) {
     window[status] = 0;
   }
   x[window[status]]
-    .querySelector(`svg[aria-label="Status ${status}"]`)
     .scrollIntoView({ behavior: "auto", block: "center", inline: "center" });
   window[status]++;
 }
