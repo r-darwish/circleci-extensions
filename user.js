@@ -51,10 +51,6 @@ function askNotificationPermission(buttonDiv) {
   buttonDiv.insertAdjacentElement("beforebegin", a);
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function getStatus(status) {
   return document.querySelectorAll(`svg[aria-label="Status ${status}"]`);
 }
@@ -81,15 +77,11 @@ function jumpToStatus(status) {
 }
 
 function counterElement(buttonDiv, status) {
-  let id = `counter-${status}`;
-  let element = document.getElementById(id);
+  const id = `counter-${status}`;
+  const element = document.getElementById(id);
   if (element != null) {
     return element;
   }
-
-  var callback = function () {
-    jumpToStatus(status);
-  };
 
   var a = document.createElement("a");
   a.style.backgroundColor = colors[status];
@@ -99,15 +91,15 @@ function counterElement(buttonDiv, status) {
   a.style.cursor = "pointer";
   a.style.display = "none";
   a.id = id;
-  a.addEventListener("click", callback);
+  a.addEventListener("click", ()=> jumpToStatus(status));
 
   buttonDiv.insertAdjacentElement("beforebegin", a);
   return a;
 }
 
 async function updateCounter(buttonDiv, status) {
-  var element = counterElement(buttonDiv, status);
-  let result = getStatus(status);
+  const element = counterElement(buttonDiv, status);
+  const result = getStatus(status);
   if (result.length == 0) {
     element.style.display = "none";
   } else {
@@ -132,8 +124,8 @@ function setWorkflowStatus(workflow) {
 }
 
 function getWorkflowStatus() {
-  var currentUrl = window.location.href;
-  var parts = currentUrl.split("/");
+  const currentUrl = window.location.href;
+  const parts = currentUrl.split("/");
   if (parts[8] != "workflows") {
     return null;
   }
@@ -152,16 +144,16 @@ function getWorkflowStatus() {
 }
 
 async function tick() {
-  var notifications = document.querySelector('[aria-label="Notifications"]');
+  const notifications = document.querySelector('[aria-label="Notifications"]');
   if (notifications == null) {
     return;
   }
 
-  var buttonDiv =
+  const buttonDiv =
     notifications.parentElement.parentElement.parentElement.parentElement;
 
-  var currentWorkflow = getWorkflowStatus();
-  var currentWorkflowStatus = currentWorkflow?.status;
+  const currentWorkflow = getWorkflowStatus();
+  const currentWorkflowStatus = currentWorkflow?.status;
   if (
     savedWorkflowStatus === "Running" &&
     currentWorkflowStatus != null &&
@@ -178,16 +170,11 @@ async function tick() {
   askNotificationPermission(buttonDiv);
 }
 
-async function main() {
-  try {
-    while (true) {
-      await tick();
-      await sleep(1000);
-    }
-  } catch (e) {
+const interval = setInterval(()=> {
+  tick().catch((e)=> {
     alert("CircieCI extension error");
     console.error(e);
-  }
-}
+    clearInterval(interval)
+  })
+}, 1000)
 
-main();
